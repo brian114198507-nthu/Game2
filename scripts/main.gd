@@ -419,7 +419,7 @@ func _show_level_two(feedback: String) -> void:
 	_add_allocation_card(row, "安全存錢罐", 0, "短期車票")
 	_add_allocation_card(row, "北風夢樹", 1, "可能增減")
 	_add_allocation_card(row, "雨滴夢樹", 2, "可能增減")
-	var total := stage_two_values[0] + stage_two_values[1] + stage_two_values[2]
+	var total: int = stage_two_values[0] + stage_two_values[1] + stage_two_values[2]
 	var total_color: Color = PALETTE.teal if total == MAX_COINS else PALETTE.gold
 	page.add_child(_label("已分配  %d / 6" % total, 16, total_color))
 	if not feedback.is_empty():
@@ -462,7 +462,7 @@ func _add_allocation_card(parent: HBoxContainer, title: String, index: int, note
 
 
 func _change_allocation(index: int, delta: int) -> void:
-	var total := stage_two_values[0] + stage_two_values[1] + stage_two_values[2]
+	var total: int = stage_two_values[0] + stage_two_values[1] + stage_two_values[2]
 	if stage_two_values[index] + delta < 0:
 		return
 	if delta > 0 and total >= MAX_COINS:
@@ -472,13 +472,13 @@ func _change_allocation(index: int, delta: int) -> void:
 
 
 func _resolve_level_two() -> void:
-	var total := stage_two_values[0] + stage_two_values[1] + stage_two_values[2]
+	var total: int = stage_two_values[0] + stage_two_values[1] + stage_two_values[2]
 	if total != MAX_COINS:
 		attempts += 1
 		_show_level_two("先把 6 枚星幣全部安排好，想一想哪些要安全留著。")
 		return
-	var has_reserve := stage_two_values[0] >= 2
-	var spread := stage_two_values[1] > 0 and stage_two_values[2] > 0
+	var has_reserve: bool = stage_two_values[0] >= 2
+	var spread: bool = stage_two_values[1] > 0 and stage_two_values[2] > 0
 	if has_reserve and spread:
 		level_two_observation = "北風夢樹少了 1 枚，雨滴夢樹多了 2 枚；分開放置後，變化不會只來自一株。存錢罐中的車票錢仍在。"
 		level_scores[1] = _score_for_attempts()
@@ -506,7 +506,7 @@ func _show_level_two_result() -> void:
 func _show_final_results() -> void:
 	state = "results"
 	_clear_page()
-	var total := level_scores[0] + level_scores[1]
+	var total: int = level_scores[0] + level_scores[1]
 	page.add_child(_label("兩把鑰匙，兩個為明天做的選擇。", 15, PALETTE.gold))
 	page.add_child(_label("今晚的冒險成果", 32))
 	page.add_child(_label("總分  %d / 200" % total, 27, PALETTE.teal))
