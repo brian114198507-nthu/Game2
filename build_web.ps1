@@ -22,6 +22,13 @@ if (-not (Test-Path -LiteralPath $output) -or (Get-Item -LiteralPath $output).La
 }
 $html = Get-Content -LiteralPath $output -Raw -Encoding utf8
 $html = $html.Replace('<html lang="en">', '<html lang="zh-Hant">')
+$pack = Join-Path $publishDir 'index.pck'
+$packVersion = (Get-FileHash -LiteralPath $pack -Algorithm SHA256).Hash.Substring(0, 12).ToLowerInvariant()
+$versionedPackName = "index-$packVersion.pck"
+$versionedPack = Join-Path $publishDir $versionedPackName
+Copy-Item -LiteralPath $pack -Destination $versionedPack -Force
+$html = $html.Replace('"executable":"index","experimentalVK"', '"executable":"index","mainPack":"' + $versionedPackName + '","experimentalVK"')
+$html = $html.Replace('"index.pck":', '"' + $versionedPackName + '":')
 [System.IO.File]::WriteAllText($output, $html, [System.Text.UTF8Encoding]::new($false))
 Get-ChildItem -LiteralPath $publishDir -Filter '*.import' -File | Remove-Item -Force
-Write-Output "Web build ready: $publishDir"
+Write-Output "Web build ready: $publishDir ($versionedPackName)"
