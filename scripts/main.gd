@@ -45,10 +45,17 @@ func _build_world() -> void:
 	environment.name = "DreamEnvironment"
 	var env := Environment.new()
 	env.background_mode = Environment.BG_COLOR
-	env.background_color = Color("101629")
+	env.background_color = Color("080d18")
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color("8196c6")
-	env.ambient_light_energy = 0.55
+	env.ambient_light_color = Color("7189b6")
+	env.ambient_light_energy = 0.48
+	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
+	env.glow_enabled = true
+	env.glow_intensity = 0.38
+	env.glow_strength = 0.72
+	env.fog_enabled = true
+	env.fog_light_color = Color("18243a")
+	env.fog_density = 0.012
 	environment.environment = env
 	add_child(environment)
 
@@ -62,63 +69,41 @@ func _build_world() -> void:
 
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-37.0, -24.0, 0.0)
-	sun.light_color = Color("b9caff")
-	sun.light_energy = 0.62
+	sun.light_color = Color("a8c6ff")
+	sun.light_energy = 0.82
+	sun.shadow_enabled = true
+	sun.directional_shadow_max_distance = 28.0
 	add_child(sun)
+	var set_path := "res://assets/models/moon_archive.glb"
+	if ResourceLoader.exists(set_path):
+		var set_scene := load(set_path) as PackedScene
+		if set_scene != null:
+			var archive := set_scene.instantiate()
+			archive.name = "MoonArchiveSet"
+			add_child(archive)
 
-	var floor_mesh := PlaneMesh.new()
-	floor_mesh.size = Vector2(30.0, 24.0)
-	_add_mesh("NightFloor", floor_mesh, Vector3(0.0, -0.55, -2.0), Color("202d45"))
-
-	var moon := SphereMesh.new()
-	moon.radius = 2.25
-	moon.height = 4.5
-	_add_mesh("Moon", moon, Vector3(-5.7, 5.1, -8.0), Color("45577a"))
-
-	var clock_ring := TorusMesh.new()
-	clock_ring.inner_radius = 1.65
-	clock_ring.outer_radius = 1.82
-	clock_ring.rings = 32
-	clock_ring.ring_segments = 8
-	var clock := _add_mesh("OldClock", clock_ring, Vector3(-2.8, 2.6, -4.1), Color("8c7350"))
-	clock.rotation_degrees.x = 90.0
-
-	# Oversized door and steps give the world its dreamlike scale.
-	_add_box("DoorFrame", Vector3(2.6, 4.8, 0.45), Vector3(-2.8, 1.8, -3.4), Color("33334a"))
-	_add_box("Door", Vector3(2.0, 4.25, 0.18), Vector3(-2.8, 1.7, -3.08), Color("4b4053"))
-	_add_sphere("DoorKnob", 0.14, Vector3(-2.12, 1.1, -2.94), Color("ffd174"))
-	for i in range(3):
-		_add_box("Step%d" % i, Vector3(2.7 - i * 0.35, 0.22, 1.05), Vector3(-2.8, -0.3 - i * 0.19, -1.4 + i * 0.7), Color("48536c"))
-
-	# Tiny golden lamps float around the doorway; no borrowed franchise props.
-	for i in range(8):
-		var x := -6.0 + float(i) * 1.5
-		var y := 1.5 + float((i * 7) % 5) * 0.62
-		_add_sphere("StarLamp%d" % i, 0.06 + float(i % 3) * 0.025, Vector3(x, y, -4.7), Color("ffd174"))
-
-	var character_path := "res://assets/models/moon_moth.glb"
-	if ResourceLoader.exists(character_path):
-		var avatar_scene := load(character_path) as PackedScene
-		if avatar_scene != null:
-			var avatar := avatar_scene.instantiate()
-			avatar.name = "MoonMoth"
-			avatar.position = Vector3(3.4, -0.45, 1.0)
-			avatar.scale = Vector3(1.55, 1.55, 1.55)
-			add_child(avatar)
+	# Cool moonlight and warm practical lights carve the room into readable depth.
+	_add_world_light("WindowMoonFill", Vector3(5.5, 3.3, -4.1), Color("87baff"), 1.55, 9.0)
+	_add_world_light("ArchiveLanternGlow", Vector3(-1.6, 2.2, -4.0), Color("ffb75b"), 1.8, 6.0)
+	_add_world_light("DreamTreeGlow", Vector3(5.8, 2.2, -1.8), Color("f7ce81"), 1.35, 5.5)
+	_add_world_light("AruLanternLight", Vector3(3.75, 0.95, -1.5), Color("ffc36a"), 1.2, 4.0)
 	lantern_light = OmniLight3D.new()
 	lantern_light.name = "LanternLight"
-	lantern_light.position = Vector3(3.9, 1.15, 0.55)
-	lantern_light.light_color = Color("ffd174")
-	lantern_light.light_energy = 0.7
-	lantern_light.omni_range = 4.5
+	lantern_light.position = Vector3(3.75, 0.95, -1.5)
+	lantern_light.light_color = Color("ffd487")
+	lantern_light.light_energy = 1.05
+	lantern_light.omni_range = 4.2
 	add_child(lantern_light)
 
-	# Two dream trees signal that saving and investment are different choices.
-	_add_box("JarPedestal", Vector3(1.5, 0.65, 1.0), Vector3(5.2, -0.18, -1.5), Color("3a465d"))
-	_add_cylinder("DreamTreeTrunkA", 0.16, 1.35, Vector3(4.4, 0.25, -2.1), Color("8a694c"))
-	_add_sphere("DreamTreeCrownA", 0.75, Vector3(4.4, 1.35, -2.1), Color("557c77"))
-	_add_cylinder("DreamTreeTrunkB", 0.14, 1.2, Vector3(6.2, 0.2, -2.15), Color("8a694c"))
-	_add_sphere("DreamTreeCrownB", 0.64, Vector3(6.2, 1.25, -2.15), Color("716794"))
+
+func _add_world_light(label: String, at: Vector3, tint: Color, strength: float, radius: float) -> void:
+	var light := OmniLight3D.new()
+	light.name = label
+	light.position = at
+	light.light_color = tint
+	light.light_energy = strength
+	light.omni_range = radius
+	add_child(light)
 
 
 func _add_mesh(label: String, mesh: Mesh, at: Vector3, tint: Color) -> MeshInstance3D:
