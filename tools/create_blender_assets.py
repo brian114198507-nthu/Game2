@@ -320,6 +320,8 @@ def make_render(scene_objects, moth_objects):
     scene.render.filepath=os.path.join(OUT,"moon_archive_preview.png")
     scene.world.color=(.025,.04,.07)
     scene.view_settings.view_transform="AgX"
+    scene.view_settings.look="AgX - Medium High Contrast"
+    scene.view_settings.exposure=-0.35
     scene.render.image_settings.color_mode="RGBA"
     camera_data=bpy.data.cameras.new("Archive Preview Camera")
     camera=bpy.data.objects.new("Archive Preview Camera",camera_data); scene.collection.objects.link(camera)
@@ -328,13 +330,14 @@ def make_render(scene_objects, moth_objects):
     scene.camera=camera
     def area(name,loc,color,power,size,target):
         d=bpy.data.lights.new(name,"AREA"); d.energy=power; d.color=color; d.shape="DISK"; d.size=size
+        d.use_shadow=True
         o=bpy.data.objects.new(name,d); scene.collection.objects.link(o); o.location=loc
         o.rotation_euler=(Vector(target)-o.location).to_track_quat("-Z","Y").to_euler()
-    area("Cold moon key",(-4,1,9),(.42,.60,1.0),1800,8,(0,-3,1))
-    area("Amber lantern bounce",(3,1,3),(1.0,.43,.14),900,4,(2,-1,1))
-    area("Soft front fill",(0,8,5),(.55,.67,1.0),1100,7,(0,-3,2))
+    area("Cold moon key",(-4,-4,9),(.42,.60,1.0),1800,8,(0,4,1))
+    area("Amber lantern bounce",(3,-3,3),(1.0,.43,.14),900,4,(2,4,1))
+    area("Soft front fill",(0,-9,5),(.55,.67,1.0),1100,7,(0,4,2))
     scene.world.use_nodes=True
-    bg=scene.world.node_tree.nodes.get("Background"); bg.inputs[0].default_value=(.045,.067,.11,1); bg.inputs[1].default_value=.35
+    bg=scene.world.node_tree.nodes.get("Background"); bg.inputs[0].default_value=(.008,.014,.028,1); bg.inputs[1].default_value=.2
     scene.render.filepath=os.path.join(OUT,"moon_archive_preview.png")
     bpy.ops.render.render(write_still=True)
 

@@ -45,17 +45,17 @@ func _build_world() -> void:
 	environment.name = "DreamEnvironment"
 	var env := Environment.new()
 	env.background_mode = Environment.BG_COLOR
-	env.background_color = Color("080d18")
+	env.background_color = Color("070b12")
 	env.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	env.ambient_light_color = Color("7189b6")
-	env.ambient_light_energy = 0.48
+	env.ambient_light_color = Color("52627f")
+	env.ambient_light_energy = 0.2
 	env.tonemap_mode = Environment.TONE_MAPPER_FILMIC
 	env.glow_enabled = true
-	env.glow_intensity = 0.38
-	env.glow_strength = 0.72
+	env.glow_intensity = 0.2
+	env.glow_strength = 0.48
 	env.fog_enabled = true
-	env.fog_light_color = Color("18243a")
-	env.fog_density = 0.012
+	env.fog_light_color = Color("0d1420")
+	env.fog_density = 0.018
 	environment.environment = env
 	add_child(environment)
 
@@ -69,8 +69,8 @@ func _build_world() -> void:
 
 	var sun := DirectionalLight3D.new()
 	sun.rotation_degrees = Vector3(-37.0, -24.0, 0.0)
-	sun.light_color = Color("a8c6ff")
-	sun.light_energy = 0.82
+	sun.light_color = Color("8fa3c5")
+	sun.light_energy = 0.28
 	sun.shadow_enabled = true
 	sun.directional_shadow_max_distance = 28.0
 	add_child(sun)
@@ -83,15 +83,15 @@ func _build_world() -> void:
 			add_child(archive)
 
 	# Cool moonlight and warm practical lights carve the room into readable depth.
-	_add_world_light("WindowMoonFill", Vector3(5.5, 3.3, -4.1), Color("87baff"), 1.55, 9.0)
-	_add_world_light("ArchiveLanternGlow", Vector3(-1.6, 2.2, -4.0), Color("ffb75b"), 1.8, 6.0)
-	_add_world_light("DreamTreeGlow", Vector3(5.8, 2.2, -1.8), Color("f7ce81"), 1.35, 5.5)
-	_add_world_light("AruLanternLight", Vector3(3.75, 0.95, -1.5), Color("ffc36a"), 1.2, 4.0)
+	_add_world_light("WindowMoonFill", Vector3(5.5, 3.3, -4.1), Color("87a9dc"), 0.72, 9.0)
+	_add_world_light("ArchiveLanternGlow", Vector3(-1.6, 2.2, -4.0), Color("ffc070"), 0.82, 6.0)
+	_add_world_light("DreamTreeGlow", Vector3(5.8, 2.2, -1.8), Color("e9bd76"), 0.62, 5.5)
+	_add_world_light("AruLanternLight", Vector3(3.75, 0.95, -1.5), Color("ffc36a"), 0.62, 4.0)
 	lantern_light = OmniLight3D.new()
 	lantern_light.name = "LanternLight"
 	lantern_light.position = Vector3(3.75, 0.95, -1.5)
 	lantern_light.light_color = Color("ffd487")
-	lantern_light.light_energy = 1.05
+	lantern_light.light_energy = 0.58
 	lantern_light.omni_range = 4.2
 	add_child(lantern_light)
 
@@ -508,6 +508,6 @@ func _show_final_results() -> void:
 
 func _process(_delta: float) -> void:
 	# A gentle lantern pulse makes the original model readable without relying on sound.
-	var glow := 0.7 + 0.12 * sin(Time.get_ticks_msec() / 850.0)
+	var glow := 0.55 + 0.08 * sin(Time.get_ticks_msec() / 850.0)
 	if is_instance_valid(lantern_light):
 		lantern_light.light_energy = glow
