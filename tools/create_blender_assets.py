@@ -308,7 +308,13 @@ def make_archive():
 
 def make_render(scene_objects, moth_objects):
     scene=bpy.context.scene
-    scene.render.engine="BLENDER_EEVEE"
+    scene.render.engine="BLENDER_WORKBENCH"
+    scene.display.shading.light="STUDIO"
+    scene.display.shading.color_type="MATERIAL"
+    scene.display.shading.show_cavity=True
+    scene.display.shading.cavity_type="BOTH"
+    scene.display.shading.curvature_ridge_factor=1.2
+    scene.display.shading.cavity_valley_factor=1.1
     scene.render.resolution_x=1600; scene.render.resolution_y=900; scene.render.resolution_percentage=100
     scene.render.image_settings.file_format="PNG"
     scene.render.filepath=os.path.join(OUT,"moon_archive_preview.png")
@@ -317,8 +323,8 @@ def make_render(scene_objects, moth_objects):
     scene.render.image_settings.color_mode="RGBA"
     camera_data=bpy.data.cameras.new("Archive Preview Camera")
     camera=bpy.data.objects.new("Archive Preview Camera",camera_data); scene.collection.objects.link(camera)
-    camera.location=(0,13.5,4.0); target=Vector((0,-.8,2.4)); direction=target-Vector(camera.location)
-    camera.rotation_euler=direction.to_track_quat("-Z","Y").to_euler(); camera_data.lens=38
+    camera.location=(0,-13.5,4.0); target=Vector((0,.8,2.4)); direction=target-Vector(camera.location)
+    camera.rotation_euler=direction.to_track_quat("-Z","Y").to_euler(); camera_data.lens=28
     scene.camera=camera
     def area(name,loc,color,power,size,target):
         d=bpy.data.lights.new(name,"AREA"); d.energy=power; d.color=color; d.shape="DISK"; d.size=size
@@ -339,6 +345,15 @@ def main():
     export_glb(os.path.join(OUT,"moon_moth.glb"),hero)
     clear_scene()
     set_objects=make_archive()
+    # GLTF converts Blender's forward axis into Godot's -Z. Reflect the static set
+    # depth so the rear wall stays behind the hero when viewed by Godot's +Z camera.
+    for o in set_objects:
+        if o.type == "MESH":
+            o.location.y = -o.location.y
+        elif o.type == "CURVE":
+            for spline in o.data.splines:
+                for point in spline.points:
+                    point.co.y = -point.co.y
     # Place the original moth just right of the UI panel, on the front stage plane.
     hero=make_moth()
     # The archive is authored around a 2.4 m child. Shift the character into the clear,
